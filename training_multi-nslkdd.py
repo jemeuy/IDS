@@ -37,7 +37,7 @@ def add_labels(df):
     return df
 
 
-# 处理二分类问题
+# 处理多分类问题
 def preprocess_labels(df):
     df.drop("level", axis=1, inplace=True)
     is_attack = df['attack_cat'].map(lambda a: 0 if a == 'normal' else 1)
