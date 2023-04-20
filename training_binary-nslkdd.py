@@ -9,7 +9,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, scale
 from sklearn.model_selection import train_test_split, KFold
 from imblearn.over_sampling import SMOTE, ADASYN, RandomOverSampler, SVMSMOTE
-from util.utils import model_accuracy_loss, plot_confusing_matrix
+from .utils import model_accuracy_loss, plot_confusing_matrix
 
 
 """
@@ -355,59 +355,59 @@ class Fc(Model):
         return tf.nn.softmax(out)
 
 # K折交叉验证
-# kf = KFold(n_splits=6, shuffle=True, random_state=666)
-#
-# accuracy_list_in = []
-# precision_list_in = []
-# recall_list_in = []
-# f1_list_in = []
+kf = KFold(n_splits=6, shuffle=True, random_state=666)
 
-# for train_idx, test_idx in kf.split(X):
-#     x_train, y_train = X[train_idx], y[train_idx]
-#     x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, random_state=666)
-#     x_test, y_test = X[test_idx], y[test_idx]
-#     print("......")
-#     model = CNN_LSTM_Fusion1()
-#     optimizer = optimizers.Adam(lr=2e-3)
-#     es = EarlyStopping(monitor='accuracy', mode='max', verbose=1, min_delta=0.003, patience=10)
-#     model.compile(optimizer=optimizer, loss=focal_loss(), metrics=['accuracy'])
-#     history = model.fit(x_train, y_train, validation_data=(x_val, y_val), verbose=1, batch_size=128, epochs=40, callbacks=[es])
-#     y_pred = model.predict(x_test)
-#     y_pred[y_pred > 0.5] = 1
-#     y_pred[y_pred <= 0.5] = 0
-#     accuracy_list_in.append(accuracy_score(y_test, y_pred))
-#     precision_list_in.append(sum(precision_score(y_test, y_pred, average=None))/2)
-#     recall_list_in.append(sum(recall_score(y_test, y_pred, average=None))/2)
-#     f1_list_in.append(sum(f1_score(y_test, y_pred, average=None))/2)
-#
-# acc = sum(accuracy_list_in) / len(accuracy_list_in)
-# precision = sum(precision_list_in) / len(precision_list_in)
-# recall = sum(recall_list_in) / len(recall_list_in)
-# f1 = sum(f1_list_in) / len(f1_list_in)
-# print("model avg accuracy is", acc)
-# print("model avg precision is", precision)
-# print("model avg recall is", recall)
-# print("model avg f1 score is", f1)
+accuracy_list_in = []
+precision_list_in = []
+recall_list_in = []
+f1_list_in = []
 
+for train_idx, test_idx in kf.split(X):
+    x_train, y_train = X[train_idx], y[train_idx]
+    x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, random_state=666)
+    x_test, y_test = X[test_idx], y[test_idx]
+    print("......")
+    model = CNN_LSTM_Fusion1()
+    optimizer = optimizers.Adam(lr=2e-3)
+    es = EarlyStopping(monitor='accuracy', mode='max', verbose=1, min_delta=0.003, patience=10)
+    model.compile(optimizer=optimizer, loss=focal_loss(), metrics=['accuracy'])
+    history = model.fit(x_train, y_train, validation_data=(x_val, y_val), verbose=1, batch_size=128, epochs=40, callbacks=[es])
+    y_pred = model.predict(x_test)
+    y_pred[y_pred > 0.5] = 1
+    y_pred[y_pred <= 0.5] = 0
+    accuracy_list_in.append(accuracy_score(y_test, y_pred))
+    precision_list_in.append(sum(precision_score(y_test, y_pred, average=None))/2)
+    recall_list_in.append(sum(recall_score(y_test, y_pred, average=None))/2)
+    f1_list_in.append(sum(f1_score(y_test, y_pred, average=None))/2)
 
-x_train, x_test, y_train, y_test = train_test_split(X, y, random_state=666)
-x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, random_state=666)
-model = Rnn()
-optimizer = optimizers.Adam(lr=2e-3)
-es = EarlyStopping(monitor='accuracy', mode='max', verbose=1, min_delta=0.003, patience=10)
-model.compile(optimizer=optimizer, loss=focal_loss(), metrics=['accuracy'])
-history = model.fit(x_train, y_train, validation_data=(x_val, y_val), verbose=1, batch_size=512, epochs=3, callbacks=[es])
-y_pred = model.predict(x_test)
-# y_pred[y_pred > 0.5] = 1
-# y_pred[y_pred <= 0.5] = 0
-y_pred = np.argmax(y_pred, axis=1)
-y_true = np.argmax(y_test, axis=1)
-print("accuracy is ", accuracy_score(y_true, y_pred))
-print("precision is ", precision_score(y_true, y_pred, average='weighted'))
-print("recall is ", recall_score(y_true, y_pred, average='weighted'))
-print("f1_score is ", f1_score(y_true, y_pred, average='weighted'))
+acc = sum(accuracy_list_in) / len(accuracy_list_in)
+precision = sum(precision_list_in) / len(precision_list_in)
+recall = sum(recall_list_in) / len(recall_list_in)
+f1 = sum(f1_list_in) / len(f1_list_in)
+print("model avg accuracy is", acc)
+print("model avg precision is", precision)
+print("model avg recall is", recall)
+print("model avg f1 score is", f1)
 
 
-plot_confusing_matrix(y_true, y_pred, 6, outcome_labels=['Benign', 'GoldenEye', 'Hulk', 'Slowloris', 'Slowhttptest', 'Heartbleed'])
+# x_train, x_test, y_train, y_test = train_test_split(X, y, random_state=666)
+# x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, random_state=666)
+# model = Rnn()
+# optimizer = optimizers.Adam(lr=2e-3)
+# es = EarlyStopping(monitor='accuracy', mode='max', verbose=1, min_delta=0.003, patience=10)
+# model.compile(optimizer=optimizer, loss=focal_loss(), metrics=['accuracy'])
+# history = model.fit(x_train, y_train, validation_data=(x_val, y_val), verbose=1, batch_size=512, epochs=3, callbacks=[es])
+# y_pred = model.predict(x_test)
+# # y_pred[y_pred > 0.5] = 1
+# # y_pred[y_pred <= 0.5] = 0
+# y_pred = np.argmax(y_pred, axis=1)
+# y_true = np.argmax(y_test, axis=1)
+# print("accuracy is ", accuracy_score(y_true, y_pred))
+# print("precision is ", precision_score(y_true, y_pred, average='weighted'))
+# print("recall is ", recall_score(y_true, y_pred, average='weighted'))
+# print("f1_score is ", f1_score(y_true, y_pred, average='weighted'))
+
+
+# plot_confusing_matrix(y_true, y_pred, 6, outcome_labels=['Benign', 'GoldenEye', 'Hulk', 'Slowloris', 'Slowhttptest', 'Heartbleed'])
 
 
